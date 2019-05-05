@@ -28,7 +28,7 @@ import org.json.simple.parser.ParseException;
 public class RobinsVersion {
 
     static IamOptions options = new IamOptions.Builder()
-            .apiKey("sP83C9a-mEePlb5-4banZN1EYLSbxavGnpYmOLYGl-v7")
+            .apiKey("************************************")
             .build();
 
     static VisualRecognition service = new VisualRecognition("2018-03-19", options);
