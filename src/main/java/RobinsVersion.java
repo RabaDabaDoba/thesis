@@ -1,15 +1,25 @@
 
+import com.github.sarxos.webcam.Webcam;
 import com.ibm.watson.developer_cloud.service.security.IamOptions;
 import com.ibm.watson.developer_cloud.visual_recognition.v3.VisualRecognition;
 import com.ibm.watson.developer_cloud.visual_recognition.v3.model.ClassifiedImages;
 import com.ibm.watson.developer_cloud.visual_recognition.v3.model.ClassifyOptions;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import javax.imageio.ImageIO;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -39,7 +49,15 @@ public class RobinsVersion {
     }
 
     public static String classifyImage(String path) throws FileNotFoundException {
-        System.out.println("test1");
+        
+        /*
+        URL url = new URL("https://images-na.ssl-images-amazon.com/images/I/71gI-IUNUkL._SY355_.jpg");
+        Image image = ImageIO.read(url);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write((RenderedImage) image,"jpg", os); 
+        InputStream fis = new ByteArrayInputStream(os.toByteArray());
+        */
+        
         InputStream imagesStream = new FileInputStream(path);
         ClassifyOptions classifyOptions = new ClassifyOptions.Builder()
                 .imagesFile(imagesStream)
@@ -52,31 +70,72 @@ public class RobinsVersion {
         //System.out.println(result.toString());
         return result.toString();
     }
+    
+    public static String classifyURL(String adress) throws FileNotFoundException, IOException {
+        
+        
+        URL url = new URL(adress);
+        Image image = ImageIO.read(url);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write((RenderedImage) image,"jpg", os); 
+        InputStream imagesStream = new ByteArrayInputStream(os.toByteArray());
+        
+        
+        
+        ClassifyOptions classifyOptions = new ClassifyOptions.Builder()
+                .imagesFile(imagesStream)
+                .imagesFilename("URL")
+                .threshold((float) 0)
+                .classifierIds(Arrays.asList("DefaultCustomModel_1716876290"))
+                .build();
 
-    public static ArrayList<ClassifiedObject> list(String JSON_string) {
+        ClassifiedImages result = service.classify(classifyOptions).execute();
+        //System.out.println(result.toString());
+        return result.toString();
+    }
+    
+    public static String classifyCamera() throws FileNotFoundException, IOException {
+        
+        
+        Webcam webcam = Webcam.getDefault();
+        webcam.open();
+	Image image = webcam.getImage();
+	//ImageIO.write(image, "PNG", new File("test.png")); //THis has to be reaned later on when it is going to be trained
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write((RenderedImage) image,"jpg", os); 
+        InputStream imagesStream = new ByteArrayInputStream(os.toByteArray());
+        
+        ClassifyOptions classifyOptions = new ClassifyOptions.Builder()
+                .imagesFile(imagesStream)
+                .imagesFilename("URL")
+                .threshold((float) 0)
+                .classifierIds(Arrays.asList("DefaultCustomModel_1716876290"))
+                .build();
+
+        ClassifiedImages result = service.classify(classifyOptions).execute();
+        //System.out.println(result.toString());
+        return result.toString();
+    }
+    
+    
+
+    public static ArrayList<ClassifiedObject> stringify(String JSON_string) {
         JSONParser parser = new JSONParser();
         
         
 
         try {
             JSONObject IBM_response_string = (JSONObject) parser.parse(JSON_string);
-
             String images_path = (String) IBM_response_string.get("images").toString();
-
             JSONArray images = (JSONArray) parser.parse(images_path);
-            //System.out.println(images.get(0));
-
             JSONObject classifiers = (JSONObject) images.get(0);
-
             String classifiers_path = (String) classifiers.get("classifiers").toString();
-            //System.out.println("This is second: " + second);
-
             JSONArray list_at_classifiers = (JSONArray) parser.parse(classifiers_path);
-            //System.out.println(asd.get(0));
-            System.out.println(list_at_classifiers);
             JSONObject classes = (JSONObject) list_at_classifiers.get(0);
             String classes_path = (String) classes.get("classes").toString();
-            //System.out.println("This is third: " + third);
+
+            
 
             //THIS IS THE ARRAY WITH ALL RESULTS
             JSONArray results_list = (JSONArray) parser.parse(classes_path);
@@ -103,11 +162,11 @@ public class RobinsVersion {
             Collections.sort(result, new Sortbyvalue());
             //reverse order so that at pos 0 is the highest %
             Collections.reverse(result);
-            //System.out.println(result);
-            System.out.println("test");
-            for (ClassifiedObject co : result) {
-                System.out.println(co.toString());
-            }
+
+
+            //for (ClassifiedObject co : result) {
+            //    System.out.println(co.getName() + " -> " + co.getValue());
+            //}
             
             return result;
 
