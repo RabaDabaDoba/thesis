@@ -39,6 +39,7 @@ public class RobinsVersion {
     }
 
     public static String classifyImage(String path) throws FileNotFoundException {
+        System.out.println("test1");
         InputStream imagesStream = new FileInputStream(path);
         ClassifyOptions classifyOptions = new ClassifyOptions.Builder()
                 .imagesFile(imagesStream)
@@ -48,12 +49,14 @@ public class RobinsVersion {
                 .build();
 
         ClassifiedImages result = service.classify(classifyOptions).execute();
-
+        //System.out.println(result.toString());
         return result.toString();
     }
 
     public static ArrayList<ClassifiedObject> list(String JSON_string) {
         JSONParser parser = new JSONParser();
+        
+        
 
         try {
             JSONObject IBM_response_string = (JSONObject) parser.parse(JSON_string);
@@ -101,7 +104,7 @@ public class RobinsVersion {
             //reverse order so that at pos 0 is the highest %
             Collections.reverse(result);
             //System.out.println(result);
-
+            System.out.println("test");
             for (ClassifiedObject co : result) {
                 System.out.println(co.toString());
             }
