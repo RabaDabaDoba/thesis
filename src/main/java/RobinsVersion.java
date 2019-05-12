@@ -36,9 +36,9 @@ import org.json.simple.parser.ParseException;
  * @author Robin
  */
 public class RobinsVersion {
-
+final static String apikey= "arK3RfX0XWFFUdA_ES6TZ8-Yb1bnC-sTeNxo4BEAm1Jy";
     static IamOptions options = new IamOptions.Builder()
-            .apiKey("sP83C9a-mEePlb5-4banZN1EYLSbxavGnpYmOLYGl-v7")
+            .apiKey(apikey)
             .build();
 
     static VisualRecognition service = new VisualRecognition("2018-03-19", options);
@@ -68,6 +68,7 @@ public class RobinsVersion {
 
         ClassifiedImages result = service.classify(classifyOptions).execute();
         //System.out.println(result.toString());
+        System.out.println(result.getImages().get(0).getClassifiers().get(0).getClasses().get(1).getClassName()); //fml one can do this way
         return result.toString();
     }
     
@@ -115,6 +116,7 @@ public class RobinsVersion {
 
         ClassifiedImages result = service.classify(classifyOptions).execute();
         //System.out.println(result.toString());
+        
         return result.toString();
     }
     
