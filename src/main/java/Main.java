@@ -40,9 +40,9 @@ public class Main {
         //ui.setVisible(true);
 
         String path = "C:/Users/Robin/Desktop/Skolarbete/Thesis/Data/mango/images.jpg";
-        //ArrayList<ClassifiedObject> test = RobinsVersion.classifyImage(path);
-        //ArrayList<ClassifiedObject> urltest = RobinsVersion.classifyURL("https://d2lnr5mha7bycj.cloudfront.net/product-image/file/large_91e6ebd6-fb26-4320-bc37-2003de8b54ce.jpg");
-        //ArrayList<ClassifiedObject> cameratest = RobinsVersion.classifyCamera();
+        //ArrayList<ClassifiedObject> test = Methods.classifyImage(path);
+        //ArrayList<ClassifiedObject> urltest = Methods.classifyURL("https://d2lnr5mha7bycj.cloudfront.net/product-image/file/large_91e6ebd6-fb26-4320-bc37-2003de8b54ce.jpg");
+        //ArrayList<ClassifiedObject> cameratest = Methods.classifyCamera();
 
         System.out.println(getClassifiers().toString());
 
