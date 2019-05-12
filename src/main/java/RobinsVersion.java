@@ -2,6 +2,7 @@
 import com.github.sarxos.webcam.Webcam;
 import com.ibm.watson.developer_cloud.service.security.IamOptions;
 import com.ibm.watson.developer_cloud.visual_recognition.v3.VisualRecognition;
+import com.ibm.watson.developer_cloud.visual_recognition.v3.model.ClassResult;
 import com.ibm.watson.developer_cloud.visual_recognition.v3.model.ClassifiedImages;
 import com.ibm.watson.developer_cloud.visual_recognition.v3.model.ClassifyOptions;
 import java.awt.Image;
@@ -48,7 +49,7 @@ final static String apikey= "arK3RfX0XWFFUdA_ES6TZ8-Yb1bnC-sTeNxo4BEAm1Jy";
         System.out.println(classifyImage(path));
     }
 
-    public static String classifyImage(String path) throws FileNotFoundException {
+    public static ArrayList<ClassifiedObject> classifyImage(String path) throws FileNotFoundException {
         
         /*
         URL url = new URL("https://images-na.ssl-images-amazon.com/images/I/71gI-IUNUkL._SY355_.jpg");
@@ -67,12 +68,12 @@ final static String apikey= "arK3RfX0XWFFUdA_ES6TZ8-Yb1bnC-sTeNxo4BEAm1Jy";
                 .build();
 
         ClassifiedImages result = service.classify(classifyOptions).execute();
-        //System.out.println(result.toString());
-        System.out.println(result.getImages().get(0).getClassifiers().get(0).getClasses().get(1).getClassName()); //fml one can do this way
-        return result.toString();
+
+       
+        return JSONToArray(result);
     }
     
-    public static String classifyURL(String adress) throws FileNotFoundException, IOException {
+    public static ArrayList<ClassifiedObject> classifyURL(String adress) throws FileNotFoundException, IOException {
         
         
         URL url = new URL(adress);
@@ -91,11 +92,11 @@ final static String apikey= "arK3RfX0XWFFUdA_ES6TZ8-Yb1bnC-sTeNxo4BEAm1Jy";
                 .build();
 
         ClassifiedImages result = service.classify(classifyOptions).execute();
-        //System.out.println(result.toString());
-        return result.toString();
+        
+        return JSONToArray(result);
     }
     
-    public static String classifyCamera() throws FileNotFoundException, IOException {
+    public static ArrayList<ClassifiedObject> classifyCamera() throws FileNotFoundException, IOException {
         
         
         Webcam webcam = Webcam.getDefault();
@@ -115,68 +116,19 @@ final static String apikey= "arK3RfX0XWFFUdA_ES6TZ8-Yb1bnC-sTeNxo4BEAm1Jy";
                 .build();
 
         ClassifiedImages result = service.classify(classifyOptions).execute();
-        //System.out.println(result.toString());
         
-        return result.toString();
+        return JSONToArray(result);
     }
     
-    
-
-    public static ArrayList<ClassifiedObject> stringify(String JSON_string) {
-        JSONParser parser = new JSONParser();
-        
-        
-
-        try {
-            JSONObject IBM_response_string = (JSONObject) parser.parse(JSON_string);
-            String images_path = (String) IBM_response_string.get("images").toString();
-            JSONArray images = (JSONArray) parser.parse(images_path);
-            JSONObject classifiers = (JSONObject) images.get(0);
-            String classifiers_path = (String) classifiers.get("classifiers").toString();
-            JSONArray list_at_classifiers = (JSONArray) parser.parse(classifiers_path);
-            JSONObject classes = (JSONObject) list_at_classifiers.get(0);
-            String classes_path = (String) classes.get("classes").toString();
-
-            
-
-            //THIS IS THE ARRAY WITH ALL RESULTS
-            JSONArray results_list = (JSONArray) parser.parse(classes_path);
-
-            Iterator<JSONObject> it = results_list.iterator();
-
-            ArrayList<JSONObject> results = new ArrayList<>();
-
-            //This line of code is just like the one above but very compact XD, not ideal.
-            //Iterator<JSONObject> it = ((JSONArray) parser.parse((String) ((JSONObject) ((JSONArray) parser.parse((String) ((JSONObject) ((JSONArray) parser.parse((String) ((JSONObject) parser.parse(test)).get("images").toString())).get(0)).get("classifiers").toString())).get(0)).get("classes").toString())).iterator();
-            //Creates a list with json pairs
-            //ArrayList<JSONObject> results = new ArrayList<>();
-            while (it.hasNext()) {
-                results.add(it.next());
-            }
-
-            //Now get them to a array without 
-            ArrayList<ClassifiedObject> result = new ArrayList<>();
-            for (JSONObject jo : results) {
-                ClassifiedObject temp = new ClassifiedObject(jo.get("class").toString(), Double.parseDouble(jo.get("score").toString().trim()));
-                result.add(temp);
-            }
-            //Sorting the results based on value
-            Collections.sort(result, new Sortbyvalue());
-            //reverse order so that at pos 0 is the highest %
-            Collections.reverse(result);
-
-
-            //for (ClassifiedObject co : result) {
-            //    System.out.println(co.getName() + " -> " + co.getValue());
-            //}
-            
-            return result;
-
-        } catch (ParseException ex) {
-            System.out.println("error =/");
-            return null;
+    public static ArrayList<ClassifiedObject> JSONToArray (ClassifiedImages ci){
+        ArrayList<ClassifiedObject> resultArray = new ArrayList<ClassifiedObject>();
+        for(ClassResult cr : ci.getImages().get(0).getClassifiers().get(0).getClasses()){
+            resultArray.add(new ClassifiedObject(cr.getClassName(), cr.getScore()));
+            //System.out.println(cr.getClassName() + "  " + cr.getScore());
         }
-
+        resultArray.sort(new Sortbyvalue());
+        
+        return resultArray;
     }
 
 }

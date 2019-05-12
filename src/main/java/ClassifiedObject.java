@@ -50,8 +50,8 @@ class Sortbyvalue implements Comparator<ClassifiedObject>
     // roll number 
     public int compare(ClassifiedObject a, ClassifiedObject b) 
     { 
-        if (a.getValue() < b.getValue()) return -1;
-        if (a.getValue() > b.getValue()) return 1;
+        if (a.getValue() > b.getValue()) return -1;
+        if (a.getValue() < b.getValue()) return 1;
         return 0; 
     } 
 } 
